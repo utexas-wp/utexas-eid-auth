@@ -125,7 +125,7 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 
 			// Redirect unauthenticated requests for admin pages to the homepage.
 			if ( is_admin() && ! is_user_logged_in() && ! defined( 'DOING_AJAX' ) ) {
-				wp_safe_redirect( '/' );
+				wp_safe_redirect( home_url() );
 				die();
 			}
 			$request = rawurldecode( $_SERVER['REQUEST_URI'] );
@@ -140,7 +140,7 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 			// Redirect *authenticated* requests for wp-login.php to the homepage.
 			if ( is_user_logged_in() && 'wp-login.php' === $pagenow ) {
 				if ( empty( $uri['query'] ) ) {
-					wp_safe_redirect( '/' );
+					wp_safe_redirect( home_url() );
 					die();
 				}
 			}
@@ -189,7 +189,6 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 		 * This is used by:
 		 *   self::site_url()
 		 *   self::network_site_url()
-		 *   self::wp_redirect()
 		 *
 		 * @param string $url The old login URL.
 		 * @return string The new login URL.

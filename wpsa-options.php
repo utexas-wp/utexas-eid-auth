@@ -17,11 +17,21 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 		'internal_config'        => array(
 			'strict'   => true,
 			'debug'    => false,
-			'baseurl'  => get_home_url(),
+			'baseurl'  => home_url(),
 			'sp'       => array(
-				'entityId'                 => get_home_url() . '/onelogin',
+				/* The entityId can be any arbitrary unique value, but it must match what the iDP has on record.
+				Here we use the domain name of the site as a unique value, appended with 'onelogin'.
+				The base url of network_site_url() here accommodates multisites; for a multisite, the
+				value here must match the one record present in the iDP's metadata record; therefore
+				we do not use home_url(), which on a multisite would be the individual site path.	*/
+				'entityId'                 => trailingslashit( network_site_url() ) . 'onelogin',
 				'assertionConsumerService' => array(
-					'url'     => get_home_url() . '/saml/login/',
+					/* The format 'saml/login/' with the trailing slash is required in order to match
+					the metadata value provide to the iDP. See eis1-wcs/pantheon-stewardship-tasks .
+					The base url of network_site_url() here accommodates multisites; for a multisite, the
+					value here must match the one record present in the iDP's metadata record; therefore
+					we do not use home_url(), which on a multisite would be the individual site path. */
+					'url'     => trailingslashit( network_site_url() ) . 'saml/login/',
 					'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 				),
 				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-cert.crt' ),
