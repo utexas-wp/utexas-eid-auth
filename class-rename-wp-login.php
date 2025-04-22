@@ -125,6 +125,7 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 
 			// Redirect unauthenticated requests for admin pages to the homepage.
 			if ( is_admin() && ! is_user_logged_in() && ! defined( 'DOING_AJAX' ) ) {
+				// Using home_url() here instead of simply '/' accommodates multisites.
 				wp_safe_redirect( home_url() );
 				die();
 			}
@@ -140,6 +141,7 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 			// Redirect *authenticated* requests for wp-login.php to the homepage.
 			if ( is_user_logged_in() && 'wp-login.php' === $pagenow ) {
 				if ( empty( $uri['query'] ) ) {
+					// Using home_url() here instead of simply '/' accommodates multisites.
 					wp_safe_redirect( home_url() );
 					die();
 				}
