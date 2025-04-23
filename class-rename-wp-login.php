@@ -136,24 +136,6 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 			$request = rawurldecode( $_SERVER['REQUEST_URI'] );
 			$uri     = wp_parse_url( $request );
 
-			//if ( ! is_user_logged_in() && str_ends_with( $uri['path'], '/saml/login' ) !== FALSE ) {
-			//	print_r($pagenow);
-			//	print_r($request);
-			//	die();
-			//	$_SERVER['REQUEST_URI'] = untrailingslashit($_SERVER['REQUEST_URI']);
-			//}
-
-			//// Provide a legacy redirect for /saml_login to the new path.
-			//if ( ! is_user_logged_in() && str_ends_with( $uri['path'], '/saml/login/' ) !== FALSE ) {
-			//	print_r($pagenow);
-			//	print_r($request);
-			//	die();
-			//	$_SERVER['REQUEST_URI'] = untrailingslashit($_SERVER['REQUEST_URI']);
-			//}
-			//print_r($uri['path']);
-			//if ( ! is_user_logged_in() && str$uri['path'] )
-			//die();
-
 			// Provide a legacy redirect for /saml_login to the new path.
 			if ( strpos( $uri['path'], '/saml_login' ) === 0 ) {
 				wp_safe_redirect( self::new_login_url() );
