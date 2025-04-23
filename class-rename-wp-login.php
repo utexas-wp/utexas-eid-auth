@@ -15,7 +15,7 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 		 *
 		 * @var string
 		 */
-		private static $new_login_slug = 'saml/login';
+		private static $new_login_slug = 'saml/login/';
 
 		/**
 		 * Whether the current request is to the WordPress default login path.
@@ -83,36 +83,40 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 		public static function plugins_loaded() {
 
 			global $pagenow;
-
-			// Disallow requests for wp-signup and wp-activate.
-			if (
-				! is_multisite()
-				&& ( strpos( rawurldecode( $_SERVER['REQUEST_URI'] ), 'wp-signup' ) !== false
-					|| strpos( rawurldecode( $_SERVER['REQUEST_URI'] ), 'wp-activate' ) !== false )
-			) {
-
-				wp_die( __( 'This feature is not enabled.', 'rename-wp-admin-login' ) );
-			}
-
 			$request = rawurldecode( $_SERVER['REQUEST_URI'] );
 			$uri     = wp_parse_url( $request );
-			// Mark requests to `wp-login.php` as "this is a login request" so we can
-			// redirect to our relocated login page.
+			$path    = $uri['path'] ?? untrailingslashit( $uri['path'] );
+
+			// Disallow requests for /wp-signup and /wp-activate.
+			if ( ! is_multisite() ) {
+				if ( strpos( $request , 'wp-signup' ) !== false
+					|| strpos( $request , 'wp-activate' ) !== false ) {
+						wp_die( __( 'This feature is not enabled.', 'rename-wp-admin-login' ) );
+				}
+			}
+
 			if ( ( strpos( $request, 'wp-login.php' ) !== false
-					|| ( isset( $uri['path'] ) && untrailingslashit( $uri['path'] ) === site_url( 'wp-login', 'relative' ) ) )
-				&& ! is_admin()
-			) {
-				self::$wp_login_php     = true;
-				$_SERVER['REQUEST_URI'] = trailingslashit( '/' . str_repeat( '-/', 10 ) );
-				$pagenow                = 'index.php';
-			} elseif ( ( isset( $uri['path'] ) && untrailingslashit( $uri['path'] ) === home_url( self::$new_login_slug, 'relative' ) ) ) {
-				$pagenow = 'wp-login.php';
+				|| ( isset( $path ) && $path === site_url( 'wp-login', 'relative' ) ) )
+				&& ! is_admin() ) {
+					// Scenario 1: the *literal* request is to `wp-login.php` or `/wp-login`.
+					// Classify this as a non-login request by changing the internal
+					// route from 'wp-login.php' to 'index.php. This will result in a 404.
+					self::$wp_login_php     = true;
+					$pagenow                = 'index.php';
+			} elseif ( ( isset( $uri['path'] )
+				&& trailingslashit( $uri['path'] ) === home_url( self::$new_login_slug, 'relative' ) ) ) {
+					// Scenario 2: the *literal request is to /saml/login/
+					// Classify this as a request to the WordPress sign-in page
+					// and add a trailing slash to match the iDP Assertion Consumer Service.
+					$_SERVER['REQUEST_URI'] = trailingslashit( $_SERVER['REQUEST_URI'] );
+					$pagenow                = 'wp-login.php';
 			} elseif ( ( strpos( $request, 'wp-register.php' ) !== false
-					|| ( isset( $uri['path'] ) && untrailingslashit( $uri['path'] ) === site_url( 'wp-register', 'relative' ) ) )
-				&& ! is_admin()
-			) {
+					|| ( isset( $path ) && $path === site_url( 'wp-register', 'relative' ) ) )
+				&& ! is_admin() ) {
+					// Scenario 3: the *literal* request is to `wp-register.php` or `/wp-register`.
+					// Classify this as a non-login request by changing the internal
+					// route from 'wp-login.php' to 'index.php. This will result in a 404.
 				self::$wp_login_php     = true;
-				$_SERVER['REQUEST_URI'] = trailingslashit( '/' . str_repeat( '-/', 10 ) );
 				$pagenow                = 'index.php';
 			}
 		}
@@ -132,19 +136,38 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 			$request = rawurldecode( $_SERVER['REQUEST_URI'] );
 			$uri     = wp_parse_url( $request );
 
+			//if ( ! is_user_logged_in() && str_ends_with( $uri['path'], '/saml/login' ) !== FALSE ) {
+			//	print_r($pagenow);
+			//	print_r($request);
+			//	die();
+			//	$_SERVER['REQUEST_URI'] = untrailingslashit($_SERVER['REQUEST_URI']);
+			//}
+
+			//// Provide a legacy redirect for /saml_login to the new path.
+			//if ( ! is_user_logged_in() && str_ends_with( $uri['path'], '/saml/login/' ) !== FALSE ) {
+			//	print_r($pagenow);
+			//	print_r($request);
+			//	die();
+			//	$_SERVER['REQUEST_URI'] = untrailingslashit($_SERVER['REQUEST_URI']);
+			//}
+			//print_r($uri['path']);
+			//if ( ! is_user_logged_in() && str$uri['path'] )
+			//die();
+
 			// Provide a legacy redirect for /saml_login to the new path.
 			if ( strpos( $uri['path'], '/saml_login' ) === 0 ) {
 				wp_safe_redirect( self::new_login_url() );
 				die();
 			}
 
-			// Redirect *authenticated* requests for wp-login.php to the homepage.
-			if ( is_user_logged_in() && 'wp-login.php' === $pagenow ) {
-				if ( empty( $uri['query'] ) ) {
+			// Redirect bare *authenticated* requests for /saml/login to the homepage.
+			// See "Scenario 2" in plugins_loaded().
+			// The check for $uri['query'] avoids this redirect for requests like
+			// /saml/login/?action=logout
+			if ( is_user_logged_in() && 'wp-login.php' === $pagenow && empty( $uri['query'] ) ) {
 					// Using home_url() here instead of simply '/' accommodates multisites.
 					wp_safe_redirect( home_url() );
 					die();
-				}
 			}
 
 			// If the request has been identified as "this is a login request"...
