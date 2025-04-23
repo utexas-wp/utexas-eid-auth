@@ -202,13 +202,10 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 		 * @return mixed
 		 */
 		public static function filter_authenticate( $user, $username, $password ) {
-			if ( ! $permit_wp_login ) {
-				$should_saml = ! isset( $_GET['loggedout'] );
-			} else {
-				$should_saml = isset( $_POST['SAMLResponse'] ) || isset( $_GET['action'] ) && 'wp-saml-auth' === $_GET['action'];
-			}
-
-			if ( $should_saml ) {
+			// If the user has just authenticated, check for a redirect parameter
+			// and redirect to that location. This code is largely in place to support
+			// multisite redirection after sign-in.
+			if ( ! isset( $_GET['loggedout'] ) ) {
 				$redirect_to = filter_input( INPUT_POST, 'RelayState', FILTER_SANITIZE_URL );
 				if ( isset( $redirect_to ) && stripos( $redirect_to, parse_url( wp_login_url(), PHP_URL_PATH ) ) ) {
 					add_filter(
