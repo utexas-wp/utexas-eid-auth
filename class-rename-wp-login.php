@@ -42,6 +42,9 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 			// Do not use WordPress core's template logic for admin actions.
 			// Instead, we use a modified version in self::wp_template_loader().
 			remove_action( 'template_redirect', 'wp_redirect_admin_locations', 1000 );
+			// Hook into the authentication process to adjust for new sign in URL.
+			// Priority 22 executes after wp-saml-auth filter_authenticate().
+			add_filter( 'authenticate', 'Rename_WP_Login::filter_authenticate', 22, 3 );
 
 			// Accommodations for network/multisites.
 			add_filter( 'network_site_url', 'Rename_WP_Login::network_site_url', 10, 3 );
@@ -188,6 +191,36 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 				@require_once ABSPATH . 'wp-login.php';
 				die;
 			}
+		}
+
+		/**
+		 * Adjustments during authentication process to accommodate new sign-in URL.
+		 *
+		 * @param mixed  $user     WordPress user reference.
+		 * @param string $username Username.
+		 * @param string $password Password supplied by the user.
+		 * @return mixed
+		 */
+		public static function filter_authenticate( $user, $username, $password ) {
+			if ( ! $permit_wp_login ) {
+				$should_saml = ! isset( $_GET['loggedout'] );
+			} else {
+				$should_saml = isset( $_POST['SAMLResponse'] ) || isset( $_GET['action'] ) && 'wp-saml-auth' === $_GET['action'];
+			}
+
+			if ( $should_saml ) {
+				$redirect_to = filter_input( INPUT_POST, 'RelayState', FILTER_SANITIZE_URL );
+				if ( isset( $redirect_to ) && stripos( $redirect_to, parse_url( wp_login_url(), PHP_URL_PATH ) ) ) {
+					add_filter(
+						'login_redirect',
+						function () use ( $redirect_to ) {
+							return $redirect_to;
+						},
+						1
+					);
+				}
+			}
+			return $user;
 		}
 
 		/**
