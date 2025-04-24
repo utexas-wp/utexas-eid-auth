@@ -6,7 +6,7 @@
 function utexas_wpsax_filter_option( $value, $option_name ) {
 	$defaults = array(
 		'connection_type'        => 'internal',
-		'auto_provision'         => false,
+		'auto_provision'         => true, // THIS SHOULD BE TRUE ON UBS
 		'permit_wp_login'        => false, // Setting to 'true' is not currently supported.
 		'get_user_by'            => 'login',
 		'user_login_attribute'   => 'username',
@@ -34,8 +34,8 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 					'url'     => trailingslashit( network_site_url() ) . 'saml/login/',
 					'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-cert.crt' ),
-				'privateKey'               => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-key.pem' ),
+				'x509cert'                 => file_get_contents( ABSPATH . 'PATH/TO/UBS/CERTS/sp-cert.crt' ),
+				'privateKey'               => file_get_contents( ABSPATH . 'PATH/TO/UBS/CERTS/sp-key.pem' ),
 			),
 			'idp'      => array(
 				'entityId'                 => 'https://enterprise.login.utexas.edu/idp/shibboleth',
@@ -46,7 +46,7 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 				'singleLogoutService'      => array(
 					'https://enterprise.login.utexas.edu/idp/profile/Logout',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/idp-cert-prod.crt' ),
+				'x509cert'                 => file_get_contents( ABSPATH . 'PATH/TO/UBS/CERTS/idp-cert-prod.crt' ),
 				'certFingerprint'          => '',
 				'certFingerprintAlgorithm' => '',
 			),
