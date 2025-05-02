@@ -1,4 +1,4 @@
-name: Sync repository to github.com/utdk/<repo>
+name: Sync repository to github.com/utexas-wp/<repo>
 on: [push, delete]
 env:
   HOST: "github.austin.utexas.edu"
@@ -22,7 +22,7 @@ jobs:
           gh auth setup-git --hostname $HOST
           gh repo clone $OWNER/$REPO
           cd $REPO
-          git remote add "public" "https://$PUBLIC_TOKEN@github.com/utdk/$REPO.git"
+          git remote add "public" "https://$PUBLIC_TOKEN@github.com/utexas-wp/$REPO.git"
 
           if [ $TRIGGER == "push" ]; then
             echo "Syncing $REF..."
