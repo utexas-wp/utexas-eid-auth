@@ -8,7 +8,6 @@
  * Text Domain: utexas-eid-auth
  * Plugin URI: https://github.com/utexas-wp/utexas-eid-auth
  * Update URI: https://github.com/utexas-wp/utexas-eid-auth/archive/refs/heads/master.zip
- * Requires PHP: 8.0
  * Requires Plugins: wp-saml-auth, wp-native-php-sessions
  *
  * @package utexas-eid-auth
