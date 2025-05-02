@@ -3,17 +3,17 @@
 /**
  * NOTE: options defined here in utexas_wpsax_filter_option are the defaults for UT sites on Pantheon. If for some reason you want to override anything set here, create your own mini-plugin -- utexas-wp-saml-auth-overrides.php.template
  */
-function utexas_wpsax_filter_option( $value, $option_name ) {
+function utexas_wpsax_filter_option($value, $option_name) {
 	$defaults = array(
 		'connection_type'        => 'internal',
-		'auto_provision'         => false,
+		'auto_provision'         => true, // THIS SHOULD BE TRUE ON UBS
 		'permit_wp_login'        => false, // Setting to 'true' is not currently supported.
 		'get_user_by'            => 'login',
 		'user_login_attribute'   => 'username',
 		'user_email_attribute'   => 'Email',
 		'display_name_attribute' => 'full_name',
 		'first_name_attribute'   => 'full_name',
-		'default_role'           => get_option( 'default_role' ),
+		'default_role'           => get_option('default_role'),
 		'internal_config'        => array(
 			'strict'   => true,
 			'debug'    => false,
@@ -24,18 +24,18 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 				The base url of network_site_url() here accommodates multisites; for a multisite, the
 				value here must match the one record present in the iDP's metadata record; therefore
 				we do not use home_url(), which on a multisite would be the individual site path.	*/
-				'entityId'                 => trailingslashit( network_site_url() ) . 'onelogin',
+				'entityId'                 => trailingslashit(network_site_url()) . 'onelogin',
 				'assertionConsumerService' => array(
 					/* The format 'saml/login/' with the trailing slash is required in order to match
 					the metadata value provide to the iDP. See eis1-wcs/pantheon-stewardship-tasks .
 					The base url of network_site_url() here accommodates multisites; for a multisite, the
 					value here must match the one record present in the iDP's metadata record; therefore
 					we do not use home_url(), which on a multisite would be the individual site path. */
-					'url'     => trailingslashit( network_site_url() ) . 'saml/login/',
+					'url'     => trailingslashit(network_site_url()) . 'saml/login/',
 					'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-cert.crt' ),
-				'privateKey'               => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-key.pem' ),
+				'x509cert'                 => file_get_contents(ABSPATH . '/mnt/extension/saml-certs/sp-cert.crt'),
+				'privateKey'               => file_get_contents(ABSPATH . '/mnt/extension/saml-certs/sp-key.pem'),
 			),
 			'idp'      => array(
 				'entityId'                 => 'https://enterprise.login.utexas.edu/idp/shibboleth',
@@ -46,7 +46,7 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 				'singleLogoutService'      => array(
 					'https://enterprise.login.utexas.edu/idp/profile/Logout',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/idp-cert-prod.crt' ),
+				'x509cert'                 => file_get_contents(ABSPATH . '/mnt/extension/saml-certs/idp-cert-prod.crt'),
 				'certFingerprint'          => '',
 				'certFingerprintAlgorithm' => '',
 			),
@@ -55,6 +55,6 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 			),
 		),
 	);
-	$value    = isset( $defaults[ $option_name ] ) ? $defaults[ $option_name ] : $value;
+	$value    = isset($defaults[$option_name]) ? $defaults[$option_name] : $value;
 	return $value;
 }
