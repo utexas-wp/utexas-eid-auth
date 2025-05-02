@@ -6,6 +6,9 @@
  * Description: UT-specific configuration for use with the WP SAML Auth plugin, including overrides for password resets and email notifications. DO NOT DISABLE THIS PLUGIN if you are using EID sign in on this site.
  * Author: Web Content Management Solutions, UT Austin
  * Text Domain: utexas-eid-auth
+ * Plugin URI: https://github.com/utexas-wp/utexas-eid-auth
+ * Update URI: https://github.com/utexas-wp/utexas-eid-auth/archive/refs/heads/master.zip
+ * Requires Plugins: wp-saml-auth, wp-native-php-sessions
  *
  * @package utexas-eid-auth
  */
@@ -17,6 +20,13 @@ require_once plugin_dir_path( __FILE__ ) . 'wpsa-options.php';
 require_once plugin_dir_path( __FILE__ ) . 'hide-passwords.php';
 require_once plugin_dir_path( __FILE__ ) . 'manage-plugins.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-rename-wp-login.php';
+class UTexasEidAuthPluginUpdater {
+	public static $slug   = 'utexas-eid-auth';
+	public static $tested = '6.8.1';
+	public static $info   = 'https://raw.githubusercontent.com/utexas-wp/utexas-eid-auth/refs/heads/master/utexas-eid-auth.php';
+	public static $changelog = '<a href="https://github.com/utexas-wp/utexas-eid-auth/blob/master/CHANGELOG.md">https://github.com/utexas-wp/utexas-eid-auth/blob/master/CHANGELOG.md</a>';
+}
+require_once plugin_dir_path( __FILE__ ) . 'plugin-updater.php';
 
 // Add JavaScript to automatically fill the email field with an @eid.utetxas.edu
 // address when creating a new user.

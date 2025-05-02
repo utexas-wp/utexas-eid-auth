@@ -2,14 +2,21 @@
 
 This is a WordPress plugin that provides configuration for using the OneLogin library to sign in using Enterprise Authentication.
 
-## Testing integration a WordPress site with OneLogin
+## Installation
 
-1. Provision an EID-based account for yourself either via the UI or `terminus wp <site>.<env> -- user create <EID> <EID>@eid.utexas.edu --role=administrator`
-1. Download the latest version of `utexas-eid-auth` at https://github.austin.utexas.edu/eis1-wcs/utexas-eid-auth/archive/refs/heads/master.zip
-1. Go the site's `/wp-admin/plugin-install.php` and choose "Upload plugin"
-1. Upload the zip file you downloaded.
-1. Activate the plugin.
-1. Now attempt to sign in and confirm you can authenticate `yoursite.utexas.edu/saml/login`
+1. In the site's Pantheon dashboard, put the "Dev" environment in SFTP mode and clone the database and files from the "Live" environment into the "Dev" environment (under "Database/Files").
+2. Navigate to the "Dev" environment in the browser and sign into the WordPress site with an administrative account.
+3. In WordPress "Dev" environment UI, go to Plugins (`/wp-admin/plugins.php`).
+4. Go to **Plugins > Add New Plugin** (`/wp-admin/plugin-install.php`)
+5. Using the "Search plugins" form, find and add "Native PHP Sessions" and "WP SAML Auth", both of which are authored by Pantheon Systems.
+6. Download the latest version of UTexas EID Authentication at https://wcms.its.utexas.edu/utexas-eid-auth.zip
+7. From the same interface, click "Upload New Plugin."
+8. Upload the zip file and activate the plugin.
+10. Sign out of the site and confirm you can authenticate at `dev-yoursite.pantheonsite.io/saml/login/`
+
+## Updates
+
+Updates are provided by the WordPress Update API. Use either the WordPress UI to update this plugin, or use Terminus (`terminus wp <site>.dev -- plugin update utexas-eid-auth`).
 
 ## Overriding configuration on a specific site
 
