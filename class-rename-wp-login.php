@@ -63,7 +63,12 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 				define( 'WP_USE_THEMES', true );
 			}
 			wp();
-
+			// Explicitly set WP to interpret variants of wp-login.php as
+			// a 404.
+			if ( strpos( $_SERVER['REQUEST_URI'], '/wp-login.php' ) === 0 ) {
+				global $wp_query;
+				$wp_query->set_404();
+			}
 			// This completes the core logic in wp-blog-header.php.
 			require_once ABSPATH . WPINC . '/template-loader.php';
 			die;
@@ -86,14 +91,6 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 		public static function plugins_loaded() {
 
 			global $pagenow;
-			// Normalize wp-login.php path across different permalink settings.
-			// When "Permalink structure" is set to "Plain" (?p=123),
-			// `wp-login.php` is interpreted literally, rather than as a route.
-			// The following normalizes it to be interpreted by this rewrite code
-			// as a route.
-			if ( strpos( $_SERVER['REQUEST_URI'], '/wp-login.php' ) === 0 ) {
-				$_SERVER['REQUEST_URI'] = trailingslashit( $_SERVER['REQUEST_URI'] );
-			}
 			$request = rawurldecode( $_SERVER['REQUEST_URI'] );
 			$uri     = wp_parse_url( $request );
 			$path    = $uri['path'] ?? untrailingslashit( $uri['path'] );
