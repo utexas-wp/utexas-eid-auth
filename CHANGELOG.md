@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.1.1
+
+* 37 - When permalink structure is set to "Plain" (e.g., ?p=123), requests to wp-login.php are not intercepted by rewrite logic by @jmf3658 in https://github.austin.utexas.edu/eis1-wcs/utexas-eid-auth/pull/38
+
 ### 2.1.0
 * 30 - Provide method for standard WordPress update process for utexas-eid-auth by @jmf3658 in https://github.austin.utexas.edu/eis1-wcs/utexas-eid-auth/pull/34
 * 23 - Interoperability of UTexas EID Auth with multisites by @jmf3658 in https://github.austin.utexas.edu/eis1-wcs/utexas-eid-auth/pull/29
