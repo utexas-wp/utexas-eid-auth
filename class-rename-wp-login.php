@@ -63,7 +63,12 @@ if ( defined( 'ABSPATH' ) && ! class_exists( 'Rename_WP_Login' ) ) {
 				define( 'WP_USE_THEMES', true );
 			}
 			wp();
-
+			// Explicitly set WP to interpret variants of wp-login.php as
+			// a 404.
+			if ( strpos( $_SERVER['REQUEST_URI'], '/wp-login.php' ) === 0 ) {
+				global $wp_query;
+				$wp_query->set_404();
+			}
 			// This completes the core logic in wp-blog-header.php.
 			require_once ABSPATH . WPINC . '/template-loader.php';
 			die;
