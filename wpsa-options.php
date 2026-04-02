@@ -34,8 +34,8 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 					'url'     => trailingslashit( network_site_url() ) . 'saml/login/',
 					'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-cert.crt' ),
-				'privateKey'               => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-key.pem' ),
+				'x509cert'                 => getCertificate('sp_x509_certificate'),
+				'privateKey'               => getCertificate('sp_private_key'),
 			),
 			'idp'      => array(
 				'entityId'                 => 'https://enterprise.login.utexas.edu/idp/shibboleth',
@@ -46,7 +46,7 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 				'singleLogoutService'      => array(
 					'https://enterprise.login.utexas.edu/idp/profile/Logout',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/idp-cert-prod.crt' ),
+				'x509cert'                 => getCertificate('idp_cert'),
 				'certFingerprint'          => '',
 				'certFingerprintAlgorithm' => '',
 			),
@@ -57,4 +57,24 @@ function utexas_wpsax_filter_option( $value, $option_name ) {
 	);
 	$value    = isset( $defaults[ $option_name ] ) ? $defaults[ $option_name ] : $value;
 	return $value;
+}
+
+/**
+ * Helper function to get certificates.
+ *
+ * @param string $name
+ *   The machine name of the cert to get, matching the samlauth config value.
+ *
+ * @return mixed
+ *   A string representing the cert, or the path to a file, or NULL.
+ */
+function getCertificate($name) {
+  // First see if the value is provided by a Pantheon Organizational secret.
+  if (function_exists('pantheon_get_secret')) {
+    $certificate = pantheon_get_secret($name) ?? NULL;
+    if (!is_null($certificate)) {
+      return $certificate;
+    }
+  }
+  return NULL;
 }
