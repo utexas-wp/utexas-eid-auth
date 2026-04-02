@@ -42,8 +42,13 @@ function utexas_overrides_filter_option( $value, $option_name ) {
 					'url'     => trailingslashit( network_site_url() ) . 'saml/login/',
 					'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 				),
-				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-cert.crt' ),
+				/* Alternate method for retrieving certs from files in the filesystem:
+				'x509cert'                 => ,
 				'privateKey'               => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/sp-key.pem' ),
+				* The following method assumes use on Pantheon hosting service.
+				*/
+				'x509cert'                 => getCertificate('sp_x509_certificate'),
+				'privateKey'               => getCertificate('sp_private_key'),
 			),
 			'idp'      => array(
 				'entityId'                 => 'https://enterprise.login.utexas.edu/idp/shibboleth',
@@ -54,7 +59,11 @@ function utexas_overrides_filter_option( $value, $option_name ) {
 				'singleLogoutService'      => array(
 					'https://enterprise.login.utexas.edu/idp/profile/Logout',
 				),
+				/* Alternate method for retrieving certs from files in the filesystem:
 				'x509cert'                 => file_get_contents( ABSPATH . 'wp-content/uploads/private/saml/assets/cert/idp-cert-prod.crt' ),
+				* The following method assumes use on Pantheon hosting service.
+				*/
+				'x509cert'                 => getCertificate('idp_cert'),
 				'certFingerprint'          => '',
 				'certFingerprintAlgorithm' => '',
 			),
