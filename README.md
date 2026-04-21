@@ -1,6 +1,6 @@
 # utexas-eid-auth
 
-This is a WordPress plugin that provides configuration for using the OneLogin library to sign in using Enterprise Authentication.
+This is a WordPress plugin that provides configuration for using the OneLogin library to sign in using the University's Enterprise Authentication single sign-on service.
 
 ## Installation
 
