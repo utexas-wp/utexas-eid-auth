@@ -43,11 +43,12 @@ add_action( 'admin_enqueue_scripts', 'utexas_wpsa_autofill_new_user_email' );
  * @param WP_User $existing_user The WordPress user object.
  * @param array   $attributes    The SAML attributes returned by the IdP.
  */
-function utexas_eid_auth_handle_existing_user($existing_user, $attributes) {
-	$fields_to_update = [
+function utexas_eid_auth_handle_existing_user( $existing_user, $attributes ) {
+	$fields_to_update = array(
 		'first_name' => 'first_name',
-		'last_name' => 'last_name',
-		'full_name' => 'nickname',
+		'last_name'  => 'last_name',
+		'full_name'  => 'nickname',
+	);
 	];
 	foreach ($fields_to_update as $attribute => $field) {
 		if (isset($attributes[$attribute][0])) {
