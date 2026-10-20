@@ -47,20 +47,12 @@ function utexas_eid_auth_handle_existing_user( $existing_user, $attributes ) {
 	$fields_to_update = array(
 		'first_name' => 'first_name',
 		'last_name'  => 'last_name',
-		'full_name'  => 'nickname',
 	);
-	];
 	foreach ($fields_to_update as $attribute => $field) {
 		if (isset($attributes[$attribute][0])) {
 			$value = sanitize_text_field($attributes[$attribute][0]);
 			update_user_meta($existing_user->ID, $field, $value);
 		}
-	}
-	if (isset($attributes['full_name'][0])) {
-		wp_update_user(array(
-			'ID'           => $existing_user->ID,
-			'display_name' => sanitize_text_field($attributes['full_name'][0]),
-		));
 	}
 }
 add_action('wp_saml_auth_existing_user_authenticated', 'utexas_eid_auth_handle_existing_user', 10, 2 );
