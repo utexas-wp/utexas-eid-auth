@@ -37,6 +37,26 @@ function utexas_wpsa_autofill_new_user_email( $hook ) {
 }
 add_action( 'admin_enqueue_scripts', 'utexas_wpsa_autofill_new_user_email' );
 
+/**
+ * Custom actions when an existing user authenticates via SAML.
+ *
+ * @param WP_User $existing_user The WordPress user object.
+ * @param array   $attributes    The SAML attributes returned by the IdP.
+ */
+function utexas_eid_auth_handle_existing_user( $existing_user, $attributes ) {
+	$fields_to_update = array(
+		'first_name' => 'first_name',
+		'last_name'  => 'last_name',
+	);
+	foreach ($fields_to_update as $attribute => $field) {
+		if (isset($attributes[$attribute][0])) {
+			$value = sanitize_text_field($attributes[$attribute][0]);
+			update_user_meta($existing_user->ID, $field, $value);
+		}
+	}
+}
+add_action('wp_saml_auth_existing_user_authenticated', 'utexas_eid_auth_handle_existing_user', 10, 2 );
+
 // After logging out of WordPress, redirect to Enterprise Authentication logout
 // page to force the session to be ended as well.
 // (More info: https://ut.service-now.com/utss/KAhome.do?number=KB0014366 )
